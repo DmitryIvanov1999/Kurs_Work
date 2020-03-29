@@ -1,12 +1,14 @@
 #ifndef SAPPER_H_INCLUDED
 #define SAPPER_H_INCLUDED
+#include <time.h>
+#include <stdlib.h>
 class One_Sapper
 {
 private:
     unsigned int rows;//Number of rows
     unsigned int cols;//Number of columns
     unsigned int mines;//Number of mines
-    unsigned int **matrix;//Matrix of game field
+    int **matrix;//Matrix of game field
     bool **open;//Matrix of boolean values
     unsigned int seconds;//Game Timer
     bool timer_mode;//Timer on/off
@@ -14,19 +16,20 @@ private:
     One_Sapper(const One_Sapper& root) = delete;//Copy constructor is deleted
     One_Sapper& operator=(const One_Sapper&) = delete;//This operator is needed no more
 public:
-    ~One_Sapper();
+    ~One_Sapper();//Destructor
     static One_Sapper& Instance();//Static method for only one object instance
-    set_rows(unsigned int param);//Setting of rows' number
+    set_rows(int param);//Setting of rows' number
     unsigned int get_rows();//Getting of rows' number
-    set_cols(unsigned int param);//Setting of columns' number
+    set_cols(int param);//Setting of columns' number
     unsigned int get_cols();//Getting of columns' number
-    set_mines(unsigned int param);//Setting of mines' number
+    set_mines(int param);//Setting of mines' number
     unsigned int get_mines();//Getting of mines' number
-    set_seconds(unsigned int param);//Setting of seconds' number
+    set_seconds(int param);//Setting of seconds' number
     unsigned int get_seconds();//Getting of seconds' number
     set_timer_mode(bool param);//Setting of game mode
     bool get_timer_mode();//Getting of game mode value
-    set_matrix(unsigned int rows, unsigned int cols);//Creatimg od dynamic rows x cols matrix
+    set_matrix();//Creatimg od dynamic rows x cols matrix
+    bool is_mine(int i, int j);//Check field on the mine
 };
 #endif // SAPPER_H_INCLUDED
 
