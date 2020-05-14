@@ -2,276 +2,40 @@
 #define SAPPER_H_INCLUDED
 #include <time.h>
 #include <stdlib.h>
+
 class One_Sapper
 {
 private:
-    unsigned int rows;//Number of rows
-    unsigned int cols;//Number of columns
-    unsigned int mines;//Number of mines
-    int **matrix;//Matrix of game field
-    bool **open;//Matrix of boolean values
-    unsigned int seconds;//Game Timer
-    bool timer_mode;//Timer on/off
-    One_Sapper();//Constructor can't create new objects
-    One_Sapper(const One_Sapper& root) = delete;//Copy constructor is deleted
-    One_Sapper& operator=(const One_Sapper&) = delete;//This operator is needed no more
+    int rows;//Строки
+    int cols;//Столбцы
+    int mines;//Мины
+    int **gridLogic;//Логический массив поля
+    int **gridView;//Графический массив поля
+    int seconds;//Секунды
+    bool timer_mode;//On/Off Timer Mode
+    One_Sapper();//Обычный конструктор, который не может создать объект
+    One_Sapper(const One_Sapper& root) = delete;//Конструктор копирования удален
+    One_Sapper& operator=(const One_Sapper&) = delete;//Оператор присваивания тоже не нужен
 public:
-    ~One_Sapper();//Destructor
-    static One_Sapper& Instance();//Static method for only one object instance
-    set_rows(int param);//Setting of rows' number
-    unsigned int get_rows();//Getting of rows' number
-    set_cols(int param);//Setting of columns' number
-    unsigned int get_cols();//Getting of columns' number
-    set_mines(int param);//Setting of mines' number
-    unsigned int get_mines();//Getting of mines' number
-    set_seconds(int param);//Setting of seconds' number
-    unsigned int get_seconds();//Getting of seconds' number
-    set_timer_mode(bool param);//Setting of game mode
-    bool get_timer_mode();//Getting of game mode value
-    set_matrix();//Creatimg od dynamic rows x cols matrix
-    bool is_mine(int i, int j);//Check field on the mine
+    ~One_Sapper();//Деструктор
+    static One_Sapper& Instance();//Функция производит единственный объект
+    void set_rows(int param);//Установить количество строк
+    int get_rows();//Получить количество строк
+    void set_cols(int param);//Установить количество столбцов
+    int get_cols();//Получить количество столбцов
+    void set_mines(int param);//Установить количество мин
+    int get_mines();//Получить количество мин
+    void set_seconds(int param);//Установить количество секунд
+    int get_seconds();//Получить количество секунд
+    void set_timer_mode(bool param);//Установить On/Off Timer Mode
+    bool get_timer_mode();//Получить On/Off Timer Mode
+    void reset();//Очистка данных после окончания игры
+    void mem_gridLogic();//Выделение памяти для динамического массива gridLogic
+    void mem_gridView();//Выделение памяти для динамического массива gridView
+    void set_gridLogic(int i, int j, int n);//Установить значение конкретной ячейке в лог. массиве
+    void set_gridView(int i, int j, int n);//Установить значение конкретной ячейке в граф. массиве
+    int get_gridLogic(int i, int j);//Получаем число по координатам лог. поля
+    int get_gridView(int i, int j);//Получаем число по координатам граф. поля
 };
+
 #endif // SAPPER_H_INCLUDED
-
-
-/*#include <iostream>
-    #include <time.h>
-    #include <windows.h>
-    #include <conio.h>
-    using namespace std;
-
-    // N - размер поля по умолчанию (оно квадратное); M - число мин на поле
-
-    #define N 10
-    #define M 10
-
-    // поле, и массив логических значений, обозначающий те поля, что открыты
-    int matrix[N][N];
-    bool open[N][N];
-
-    // проверяет ячейку на мину; выход за пределы возвращает false
-    bool mine(int i, int j){
-        if((i>=0) && (i<N)){
-            if((j>=0) && (j<N)){
-                if(matrix[i][j]==-1) return true;
-            }
-        }
-        return false;
-    }
-
-    // проверяет ячейку на пустоту (true), выход за пределы массива возвращает false
-    bool empty(int i, int j){
-        if((i>=0) && (i<N)){
-            if((j>=0) && (j<N)){
-                if(matrix[i][j]==0) return true;
-            }
-        }
-        return false;
-    }
-
-    // рекурсивная функция, которая открывает поля в точке попадания
-    void clean(int i,int j){
-        // проверим на выход за пределы массива
-        if((i>=0) && (i<N)){
-            if((j>=0) && (j<N)){
-                // проверим, не было ли открыто поле раньше
-                if(!open[i][j]){
-                    // откроем
-                    open[i][j]=true;
-                    // если поле пустое (=0), просто пооткрываем всех его соседей
-                    if(matrix[i][j]==0){
-                        clean(i-1,j-1);
-                        clean(i-1,j);
-                        clean(i-1,j+1);
-                        clean(i,j-1);
-                        clean(i,j+1);
-                        clean(i+1,j-1);
-                        clean(i+1,j);
-                        clean(i+1,j+1);
-                    }
-                    // если не пустое (!=0) открываем только пустых (=0) соседей
-                    else{
-                        if(empty(i-1,j-1)) clean(i-1,j-1);
-                        if(empty(i-1,j)) clean(i-1,j);
-                        if(empty(i-1,j+1)) clean(i-1,j+1);
-                        if(empty(i,j-1)) clean(i,j-1);
-                        if(empty(i,j+1)) clean(i,j+1);
-                        if(empty(i+1,j-1)) clean(i+1,j-1);
-                        if(empty(i+1,j)) clean(i+1,j);
-                        if(empty(i+1,j+1)) clean(i+1,j+1);
-                    }
-                }
-            }
-        }
-    }
-
-    // рисует "мину" - звездочку красного цвета
-    void coutmine(HANDLE hConsole){
-        SetConsoleTextAttribute(hConsole, 12);  // red text
-        cout<<"* ";
-        SetConsoleTextAttribute(hConsole, 7);   // white text
-    }
-
-    // рисует минное поле с учетом открытых и закрытых полей
-    // и вспомогательные оси
-    void draw_matrix(HANDLE hConsole){
-        SetConsoleTextAttribute(hConsole, 6);  // dark yellow text
-        cout<<"  A B C D E F G H I J\n";
-        SetConsoleTextAttribute(hConsole, 7);  // white text
-        for(int x=0;x<N;x++){
-            SetConsoleTextAttribute(hConsole, 6);  // dark yellow text
-            cout<<x<<" ";
-            SetConsoleTextAttribute(hConsole, 7);  // white text
-            for(int y=0;y<N;y++){
-                if(open[x][y]){
-                    SetConsoleTextAttribute(hConsole, 8);  // gray text
-                    if(matrix[x][y]==-1) coutmine(hConsole);
-                    else if(matrix[x][y]==0) cout<<". ";
-                    else cout<<matrix[x][y]<<" ";
-                    SetConsoleTextAttribute(hConsole, 7);  // white text
-                }
-                else{
-
-                    cout<<"# ";
-
-                }
-            }
-            cout<<"\n";
-        }
-    }
-
-    // функция завершает игру, выведя одну из двух надписей "Loser!" или "Winner!"
-    void fin(HANDLE hConsole, bool loser){
-        COORD coord;
-        coord.X = 33;
-        coord.Y = 10;
-        system("cls");
-        draw_matrix(hConsole);
-        SetConsoleCursorPosition(hConsole, coord);
-        if(loser){
-            SetConsoleTextAttribute(hConsole, 12);  // red text
-            cout<<"L O S E R ! ! !";
-            SetConsoleTextAttribute(hConsole, 7);  // white text
-        }
-        else{
-            SetConsoleTextAttribute(hConsole, 10);  // green text
-            cout<<"W I N N E R ! ! !";
-            SetConsoleTextAttribute(hConsole, 7);  // white text
-        }
-        cout<<"\n\n\n\n";
-        _getch();
-    }
-
-    // в случае проигрыша эта функция откроет все мины
-    void openmines(){
-        for(int i=0;i<N;i++){
-            for(int j=0;j<N;j++){
-                if(matrix[i][j]==-1) open[i][j]=true;
-            }
-        }
-    }
-
-    // проверяет, все ли поле открыто, кроме мин (таково условие победы)
-    bool checkwin(){
-        for(int x=0;x<N;x++){
-            for(int y=0;y<N;y++){
-                if((matrix[x][y]!=-1) && (!open[x][y])) return false;
-            }
-        }
-        return true;
-    }
-
-
-    int main()
-    {
-        bool flag;
-        char ans='0';
-        int delta=0;
-        int MINES;
-        int i,j,k=0;
-        char s[3];
-        // хэндл экна необходим для рисования цветного текста
-        HANDLE  hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-        // инициализация
-        setlocale(LC_ALL, "rus");
-        srand((int)time(NULL));
-        while(1)
-        {
-        MINES=M+delta;
-        // все чистим
-        for(int c=0;c<100;c++){ matrix[c/10][c%10]=0; open[c/10][c%10]=false; }
-        // заполняем массив поля минами
-        for(int c=0;c<MINES;c++){
-            do{
-                i=rand()%N; j=rand()%N;
-            }while(matrix[i][j]!=0);
-            matrix[i][j]=-1;
-        }
-        // заполняем массив поля цифрами
-        for(i=0;i<N;i++){
-            for(j=0;j<N;j++){
-                if(matrix[i][j]!=-1){
-                    k=0;
-                    if(mine(i-1,j-1)) k++;
-                    if(mine(i-1,j)) k++;
-                    if(mine(i-1,j+1)) k++;
-                    if(mine(i,j-1)) k++;
-                    if(mine(i,j+1)) k++;
-                    if(mine(i+1,j-1)) k++;
-                    if(mine(i+1,j)) k++;
-                    if(mine(i+1,j+1)) k++;
-                    matrix[i][j]=k;
-                }
-            }
-        }
-
-        // главный игровой цикл
-        while(true){
-            // чистим экран от старого рисунка
-            system("cls");
-            cout << "Сейчас на поле " << N+delta << " мин!\n\n\n";
-            // рисуем поле
-            draw_matrix(hConsole);
-            cout<<"\n";
-            // запрашиваем координаты удара
-            cout<<"Введите координаты удара: ";
-            cin>>s;
-            // переводим координаты в цифровой вид
-            if((s[0]>=65) && (s[0]<=74)) j=s[0]-65;        // буква в промежутке от A до J
-            else if((s[0]>=97) && (s[0]<=106)) j=s[0]-97;  // буква в промежутке от a до j
-            else continue;                              // если введены неверные значения, возврат в начало цикла
-            if((s[1]>=48)&&(s[1]<=57)) i=s[1]-48;
-            else continue;
-            // далее проверяем все восемь окрестных полей на пустые клетки
-            // и если надо показываем некий кусок поля
-            clean(i,j);
-
-            if(mine(i,j)){ openmines(); fin(hConsole, true); flag=false; break; }  // программа покидает цикл в случае проигрыша
-            if(checkwin()){ fin(hConsole, false); flag=true; break; }                 // или победы
-        }
-        while(1)
-        {
-        system("cls");
-        cout << "Играть дальше? (y/n)\n";
-        cin >> ans;
-        if(ans=='y'||ans=='n')
-            break;
-        else
-            continue;
-        }
-        if(ans=='y')
-        {
-            if(flag==true)
-                delta++;
-            if(delta==90)
-            {
-                cout << "Вы очень удачливы!\n";
-                break;
-            }
-            continue;
-        }
-        else
-            break;
-        }
-        return 0;
-    }*/
